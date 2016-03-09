@@ -103,10 +103,9 @@ class SmartPlug(object):
         files = {'file': xml}
 
         try:
-            res = requests.post(self.url, auth=self.auth, files=files, timeout=1)
+            res = requests.post(self.url, auth=self.auth, files=files, timeout=5)
         except requests.exceptions.Timeout as e:
             print(e.__str__())
-            print('Edimax SmartPlug in buggy state')
             return 'FAILED'
         
         if res.status_code == requests.codes.ok:
@@ -140,7 +139,11 @@ class SmartPlug(object):
 
         files = {'file': xml}
 
-        res = requests.post(self.url, auth=self.auth, files=files)
+        try:
+            res = requests.post(self.url, auth=self.auth, files=files, timeout=5)
+        except requests.exceptions.Timeout as e:
+            print(e.__str__())
+            return 'FAILED'
 
         if res.status_code == requests.codes.ok:
             dom = parseString(res.text)
