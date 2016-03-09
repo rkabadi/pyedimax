@@ -102,8 +102,13 @@ class SmartPlug(object):
 
         files = {'file': xml}
 
-        res = requests.post(self.url, auth=self.auth, files=files)
-
+        try:
+            res = requests.post(self.url, auth=self.auth, files=files, timeout=1)
+        except requests.exceptions.Timeout as e:
+            print(e.__str__())
+            print('Edimax SmartPlug in buggy state')
+            return 'FAILED'
+        
         if res.status_code == requests.codes.ok:
             dom = parseString(res.text)
 
@@ -165,7 +170,6 @@ class SmartPlug(object):
         :rtype: str
         :return: 'ON' or 'OFF'
         """
-
         res = self._post_xml(self._xml_cmd_setget_state("get", ""))
 
         if res != "ON" and res != "OFF":
